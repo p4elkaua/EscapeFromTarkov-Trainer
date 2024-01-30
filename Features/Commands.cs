@@ -406,25 +406,28 @@ internal class Commands : ToggleFeature
 			if (feature is Commands or GameState)
 				continue;
 
-			CreateCommand($"{feature.Name}", $"(?<{ValueGroup}>(on)|(off))", m => OnToggleFeature(feature, m));
+			if (feature is LootItems liFeature) 
+			{
 
-			if (feature is not LootItems liFeature) 
-				continue;
-
-			CreateCommand("list", $"(?<{ValueGroup}>.*)", m => ListLootItems(m, liFeature));
-			CreateCommand("listr", $"(?<{ValueGroup}>.*)", m => ListLootItems(m, liFeature, ELootRarity.Rare));
-			CreateCommand("listsr", $"(?<{ValueGroup}>.*)", m => ListLootItems(m, liFeature, ELootRarity.Superrare));
-
-			var colorNames = string.Join("|", ColorConverter.ColorNames());
-			CreateCommand("track", $"(?<value>.+?)(?<extra> ({colorNames}|\\[[\\.,\\d ]*\\]{{1}}))?", m => TrackLootItem(m, liFeature));
-			CreateCommand("trackr", $"(?<value>.+?)(?<extra> ({colorNames}|\\[[\\.,\\d ]*\\]{{1}}))?", m => TrackLootItem(m, liFeature, ELootRarity.Rare));
-			CreateCommand("tracksr", $"(?<value>.+?)(?<extra> ({colorNames}|\\[[\\.,\\d ]*\\]{{1}}))?", m => TrackLootItem(m, liFeature, ELootRarity.Superrare));
-
-			CreateCommand("untrack", $"(?<{ValueGroup}>.+)", m => UnTrackLootItem(m, liFeature));
-			CreateCommand("loadtl", $"(?<{ValueGroup}>.+)", m => LoadTrackList(m, liFeature));
-			CreateCommand("savetl", $"(?<{ValueGroup}>.+)", m => SaveTrackList(m, liFeature));
-
-			CreateCommand("tracklist", () => ShowTrackList(liFeature));
+				CreateCommand("list", $"(?<{ValueGroup}>.*)", m => ListLootItems(m, liFeature));
+				CreateCommand("listr", $"(?<{ValueGroup}>.*)", m => ListLootItems(m, liFeature, ELootRarity.Rare));
+				CreateCommand("listsr", $"(?<{ValueGroup}>.*)", m => ListLootItems(m, liFeature, ELootRarity.Superrare));
+	
+				var colorNames = string.Join("|", ColorConverter.ColorNames());
+				CreateCommand("track", $"(?<value>.+?)(?<extra> ({colorNames}|\\[[\\.,\\d ]*\\]{{1}}))?", m => TrackLootItem(m, liFeature));
+				CreateCommand("trackr", $"(?<value>.+?)(?<extra> ({colorNames}|\\[[\\.,\\d ]*\\]{{1}}))?", m => TrackLootItem(m, liFeature, ELootRarity.Rare));
+				CreateCommand("tracksr", $"(?<value>.+?)(?<extra> ({colorNames}|\\[[\\.,\\d ]*\\]{{1}}))?", m => TrackLootItem(m, liFeature, ELootRarity.Superrare));
+	
+				CreateCommand("untrack", $"(?<{ValueGroup}>.+)", m => UnTrackLootItem(m, liFeature));
+				CreateCommand("loadtl", $"(?<{ValueGroup}>.+)", m => LoadTrackList(m, liFeature));
+				CreateCommand("savetl", $"(?<{ValueGroup}>.+)", m => SaveTrackList(m, liFeature));
+	
+				CreateCommand("tracklist", () => ShowTrackList(liFeature));
+   			}
+	  		else
+	 		{
+				CreateCommand($"{feature.Name}", $"(?<{ValueGroup}>(on)|(off))", m => OnToggleFeature(feature, m));
+			}
 		}
 
 		CreateCommand("dump", Dump);
@@ -487,6 +490,8 @@ internal class Commands : ToggleFeature
 
 	private void ShowTrackList(LootItems feature, bool changed = false)
 	{
+     	if (feature == null)
+	        return;
 		if (changed)
 			AddConsoleLog("Tracking list updated...");
 
@@ -502,6 +507,8 @@ internal class Commands : ToggleFeature
 
 	private static bool TryGetTrackListFilename(Match match, [NotNullWhen(true)] out string? filename)
 	{
+     	if (feature == null)
+	        return;
 		filename = null;
 
 		var matchGroup = match.Groups[ValueGroup];
@@ -521,6 +528,8 @@ internal class Commands : ToggleFeature
 
 	private static void LoadTrackList(Match match, LootItems feature)
 	{
+     	if (feature == null)
+	        return;
 		if (!TryGetTrackListFilename(match, out var filename))
 			return;
 
@@ -529,6 +538,8 @@ internal class Commands : ToggleFeature
 
 	private static void SaveTrackList(Match match, LootItems feature)
 	{
+     	if (feature == null)
+	        return;
 		if (!TryGetTrackListFilename(match, out var filename))
 			return;
 
@@ -537,6 +548,8 @@ internal class Commands : ToggleFeature
 
 	private void UnTrackLootItem(Match match, LootItems feature)
 	{
+		if (feature == null)
+	        return;
 		var matchGroup = match.Groups[ValueGroup];
 		if (matchGroup is not {Success: true})
 			return;
@@ -546,6 +559,8 @@ internal class Commands : ToggleFeature
 
 	private void TrackLootItem(Match match, LootItems feature, ELootRarity? rarity = null)
 	{
+     	if (feature == null)
+	        return;
 		var matchGroup = match.Groups[ValueGroup];
 		if (matchGroup is not {Success: true})
 			return;
@@ -560,6 +575,8 @@ internal class Commands : ToggleFeature
 
 	private void ListLootItems(Match match, LootItems feature, ELootRarity? rarityFilter = null)
 	{
+      	if (feature == null)
+	        return;
 		var search = string.Empty;
 		var matchGroup = match.Groups[ValueGroup];
 		if (matchGroup is {Success: true})
@@ -609,6 +626,8 @@ internal class Commands : ToggleFeature
 
 	private static void FindItemsInContainers(GameWorld world, Dictionary<string, List<Item>> itemsPerName)
 	{
+     	if (feature == null)
+	        return;
 		var owners = world.ItemOwners; // contains all containers: corpses, LootContainers, ...
 		foreach (var owner in owners)
 		{
@@ -625,6 +644,8 @@ internal class Commands : ToggleFeature
 
 	private static void FindItemsInRootItem(Dictionary<string, List<Item>> itemsPerName, Item? rootItem)
 	{
+     	if (feature == null)
+	        return;
 		var items = rootItem?
 			.GetAllItems()?
 			.ToArray();
@@ -637,6 +658,8 @@ internal class Commands : ToggleFeature
 
 	private static void FindLootItems(GameWorld world, Dictionary<string, List<Item>> itemsPerName, LootItems feature)
 	{
+     	if (feature == null)
+	        return;
 		var lootItems = world.LootItems;
 		var filteredItems = new List<Item>();
 		for (var i = 0; i < lootItems.Count; i++)
@@ -661,6 +684,8 @@ internal class Commands : ToggleFeature
 
 	private static void IndexItems(IEnumerable<Item> items, Dictionary<string, List<Item>> itemsPerName)
 	{
+     	if (feature == null)
+	        return;
 		foreach (var item in items)
 		{
 			if (!item.IsValid() || item.IsFiltered())
