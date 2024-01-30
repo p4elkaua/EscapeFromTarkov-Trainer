@@ -406,7 +406,7 @@ internal class Commands : ToggleFeature
 			if (feature is Commands or GameState)
 				continue;
 
-			if (feature is LootItems liFeature) 
+			if (feature is LootItems liFeature && liFeature != null)
 			{
 
 				CreateCommand("list", $"(?<{ValueGroup}>.*)", m => ListLootItems(m, liFeature));
@@ -490,8 +490,8 @@ internal class Commands : ToggleFeature
 
 	private void ShowTrackList(LootItems feature, bool changed = false)
 	{
-     	if (feature == null)
-	        return;
+		if (feature is LootItems liFeature)
+		{
 		if (changed)
 			AddConsoleLog("Tracking list updated...");
 
@@ -503,12 +503,13 @@ internal class Commands : ToggleFeature
 			var extra = item.Rarity.HasValue ? $" ({item.Rarity.Value.Color()})" : string.Empty;
 			AddConsoleLog(item.Color.HasValue ? $"Tracking: {item.Name.Color(item.Color.Value)}{extra}" : $"Tracking: {item.Name}{extra}");
 		}
+  		}
 	}
 
 	private static bool TryGetTrackListFilename(Match match, [NotNullWhen(true)] out string? filename)
 	{
-     	if (feature == null)
-	        return;
+		if (feature is LootItems liFeature)
+		{
 		filename = null;
 
 		var matchGroup = match.Groups[ValueGroup];
@@ -524,43 +525,47 @@ internal class Commands : ToggleFeature
 			filename += ".tl";
 
 		return true;
+  		}
 	}
 
 	private static void LoadTrackList(Match match, LootItems feature)
 	{
-     	if (feature == null)
-	        return;
+		if (feature is LootItems liFeature)
+		{
 		if (!TryGetTrackListFilename(match, out var filename))
 			return;
 
 		ConfigurationManager.LoadPropertyValue(filename, feature, nameof(LootItems.TrackedNames));
+  		}
 	}
 
 	private static void SaveTrackList(Match match, LootItems feature)
 	{
-     	if (feature == null)
-	        return;
+		if (feature is LootItems liFeature)
+		{
 		if (!TryGetTrackListFilename(match, out var filename))
 			return;
 
 		ConfigurationManager.SavePropertyValue(filename, feature, nameof(LootItems.TrackedNames));
+  		}
 	}
 
 	private void UnTrackLootItem(Match match, LootItems feature)
 	{
-		if (feature == null)
-	        return;
+		if (feature is LootItems liFeature)
+		{
 		var matchGroup = match.Groups[ValueGroup];
 		if (matchGroup is not {Success: true})
 			return;
 
 		ShowTrackList(feature, feature.UnTrack(matchGroup.Value));
+  		}
 	}
 
 	private void TrackLootItem(Match match, LootItems feature, ELootRarity? rarity = null)
 	{
-     	if (feature == null)
-	        return;
+		if (feature is LootItems liFeature)
+		{
 		var matchGroup = match.Groups[ValueGroup];
 		if (matchGroup is not {Success: true})
 			return;
@@ -571,12 +576,13 @@ internal class Commands : ToggleFeature
 			color = ColorConverter.Parse(extraGroup.Value);
 
 		ShowTrackList(feature, feature.Track(matchGroup.Value, color, rarity));
+  		}
 	}
 
 	private void ListLootItems(Match match, LootItems feature, ELootRarity? rarityFilter = null)
 	{
-      	if (feature == null)
-	        return;
+		if (feature is LootItems liFeature)
+		{
 		var search = string.Empty;
 		var matchGroup = match.Groups[ValueGroup];
 		if (matchGroup is {Success: true})
@@ -622,12 +628,13 @@ internal class Commands : ToggleFeature
 
 		AddConsoleLog("------");
 		AddConsoleLog($"found {count.ToString().Cyan()} items");
+  		}
 	}
 
 	private static void FindItemsInContainers(GameWorld world, Dictionary<string, List<Item>> itemsPerName)
 	{
-     	if (feature == null)
-	        return;
+		if (feature is LootItems liFeature)
+		{
 		var owners = world.ItemOwners; // contains all containers: corpses, LootContainers, ...
 		foreach (var owner in owners)
 		{
@@ -640,12 +647,13 @@ internal class Commands : ToggleFeature
 
 			FindItemsInRootItem(itemsPerName, rootItem);
 		}
+  		}
 	}
 
 	private static void FindItemsInRootItem(Dictionary<string, List<Item>> itemsPerName, Item? rootItem)
 	{
-     	if (feature == null)
-	        return;
+		if (feature is LootItems liFeature)
+		{
 		var items = rootItem?
 			.GetAllItems()?
 			.ToArray();
@@ -654,12 +662,13 @@ internal class Commands : ToggleFeature
 			return;
 
 		IndexItems(items, itemsPerName);
+  		}
 	}
 
 	private static void FindLootItems(GameWorld world, Dictionary<string, List<Item>> itemsPerName, LootItems feature)
 	{
-     	if (feature == null)
-	        return;
+		if (feature is LootItems liFeature)
+		{
 		var lootItems = world.LootItems;
 		var filteredItems = new List<Item>();
 		for (var i = 0; i < lootItems.Count; i++)
@@ -680,12 +689,13 @@ internal class Commands : ToggleFeature
 		}
 
 		IndexItems(filteredItems, itemsPerName);
+  		}
 	}
 
 	private static void IndexItems(IEnumerable<Item> items, Dictionary<string, List<Item>> itemsPerName)
 	{
-     	if (feature == null)
-	        return;
+		if (feature is LootItems liFeature)
+		{
 		foreach (var item in items)
 		{
 			if (!item.IsValid() || item.IsFiltered())
@@ -700,6 +710,7 @@ internal class Commands : ToggleFeature
 
 			pnList.Add(item);
 		}
+  		}
 	}
 
 	private static string GetFeatureHelpText(ToggleFeature feature)
