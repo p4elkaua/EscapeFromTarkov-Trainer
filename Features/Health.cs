@@ -60,6 +60,7 @@ internal class Health : ToggleFeature
 
 		HarmonyPatchOnce(harmony =>
 		{
+  			System.Console.Writeline("Harmony patch")
 			var original = HarmonyLib.AccessTools.Method(typeof(ActiveHealthController), nameof(ActiveHealthController.ApplyDamage));
 			if (original == null)
 				return;
