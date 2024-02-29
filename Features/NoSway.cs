@@ -23,7 +23,7 @@ internal class NoSway : ToggleFeature
 		if (weaponAnimation == null)
 			return;
 
-        weaponAnimation.motionReact.Intensity = 0f;
+        weaponAnimation.MotionReact.Intensity = 0f;
         weaponAnimation.Breath.Intensity = 0f;
 
         weaponAnimation.HandsContainer.HandsRotation.Current.x = 0f;
