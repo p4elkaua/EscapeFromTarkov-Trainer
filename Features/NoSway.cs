@@ -23,16 +23,15 @@ internal class NoSway : ToggleFeature
 		if (weaponAnimation == null)
 			return;
 
-		var motionReact = weaponAnimation.MotionReact;
-		motionReact.Intensity = 0f;
-		motionReact.SwayFactors = Vector3.zero;
-		motionReact.Velocity = Vector3.zero;
+        weaponAnimation.motionReact.Intensity = 0f;
+        weaponAnimation.Breath.Intensity = 0f;
 
-		weaponAnimation.Breath.Intensity = 0;
-		weaponAnimation.Walk.Intensity = 0;
-		weaponAnimation.Shootingg.Stiffness = 0;
-		weaponAnimation.ForceReact.Intensity = 0;
-		weaponAnimation.WalkEffectorEnabled = false;
+        weaponAnimation.HandsContainer.HandsRotation.Current.x = 0f;
+        weaponAnimation.HandsContainer.HandsRotation.Current.y = 0f;
+        weaponAnimation.HandsContainer.HandsRotation.Current.z = 0f;
+        weaponAnimation.HandsContainer.HandsPosition.Current.x = 0f;
+        weaponAnimation.HandsContainer.HandsPosition.Current.y = 0f;
+        weaponAnimation.HandsContainer.HandsPosition.Current.z = 0f;
 
 	}
 }
